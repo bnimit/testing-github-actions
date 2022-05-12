@@ -23,6 +23,10 @@ jobs:
           files: |
             'db/**'
             
+      - name: Run step when a file changes
+        if: contains(steps.changed-files.outputs.modified_files, 'db/**')
+        run: echo Migrations Found!!
+      
       - name: List all changed files
         run: |
           echo These are the Migration Changes
