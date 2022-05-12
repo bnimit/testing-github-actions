@@ -27,6 +27,8 @@ jobs:
         run: |
           echo These are the Migration Changes
           echo ${{ steps.migration-files-changed.outputs.all_changed_files }}
+          LL=$(echo ${{ steps.migration-files-changed.outputs.all_changed_files }} | jq '. | length' )
+          echo "::set-output name=Number_Of_Files::$LL"
       - name: Identify Branch Name
         run: echo ${{ github.event.pull_request.head.ref }}
         id: branch_name
