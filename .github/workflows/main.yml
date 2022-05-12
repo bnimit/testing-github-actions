@@ -21,7 +21,7 @@ jobs:
         uses: tj-actions/changed-files@v19
         with:
           files: |
-            '*/db/**'
+            'db/**'
 
       - name: List all changed files
         run: |
