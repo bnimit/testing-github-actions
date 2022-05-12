@@ -27,8 +27,18 @@ jobs:
         run: |
           echo These are the Migration Changes
           echo ${{ steps.migration-files-changed.outputs.all_changed_files }}
-          LL=$(echo ${{ steps.migration-files-changed.outputs.all_changed_files }} | jq '. | length' )
-          echo "::set-output name=Number_Of_Files::$LL"
+      
+      - name: Find Migration Changes
+        if: ${{ steps.migration-files-changed.outputs.all_changed_files }}
+        run: echo Migrations Found!!
+      
       - name: Identify Branch Name
         run: echo ${{ github.event.pull_request.head.ref }}
-        id: branch_name
+        id: branch-name
+      
+      - name: Compare Legal Branch Name
+        if: startsWith( steps.branch-name.outputs, 'db_migrate') != true
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
