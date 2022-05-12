@@ -25,9 +25,8 @@ jobs:
         id: migration-files-changed
         uses: tj-actions/changed-files@v19
         with:
-          files: |
-            'db/**'
-            
+          path: .github/workflows/            
+          
       - name: Run step when a file changes
         if: contains(steps.changed-files.outputs.modified_files, 'db/**')
         run: echo Migrations Found!!
