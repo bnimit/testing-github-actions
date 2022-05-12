@@ -21,8 +21,8 @@ jobs:
         uses: tj-actions/changed-files@v19
         with:
           files: |
-            **/db
-            **/.github/workflows
+            '*/db/**'
+
       - name: List all changed files
         run: |
           echo These are the Migration Changes
