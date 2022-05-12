@@ -15,8 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 2
-
+          fetch-depth: 0
       - name: Get changed files
         id: migration-files-changed
         uses: tj-actions/changed-files@v19
@@ -28,3 +27,6 @@ jobs:
         run: |
           echo These are the Migration Changes
           echo ${{ steps.migration-files-changed.outputs.all_changed_files }}
+      - name: Identify Branch Name
+        run: echo ${{ github.event.pull_request.head.ref }}
+        id: branch_name
