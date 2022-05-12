@@ -27,7 +27,7 @@ jobs:
         id: migration-files-changed
         uses: tj-actions/changed-files@v19
         with:
-          path: db/
+          path: db
           
       - name: Run step when a file changes
         if: ${{ steps.changed-files.outputs.modified_files }}
