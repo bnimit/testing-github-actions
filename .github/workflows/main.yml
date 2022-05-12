@@ -30,7 +30,7 @@ jobs:
           path: db/
           
       - name: Run step when a file changes
-        if: contains(steps.changed-files.outputs.modified_files')
+        if: contains(steps.changed-files.outputs.modified_files)
         run: echo Migrations Found!!
       
       - name: List all changed files
