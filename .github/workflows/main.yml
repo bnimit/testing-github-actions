@@ -49,6 +49,7 @@ jobs:
       - name: Print Values 
         run: |
           echo ${{ steps.migration-files-changed.outputs.files_changed }}
+          echo ${{ github.ref }}
           echo ${{ startsWith(steps.branch-name.outputs, 'db_migrate') }}
       
       - name: Compare Legal Branch Name
