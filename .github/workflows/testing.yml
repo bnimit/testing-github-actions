@@ -27,7 +27,7 @@ jobs:
         run: echo ${{ github.event.pull_request.head.ref }}
         
       - name: Check If Branch Name is Legal
-        if: contains(steps.get-changes.outputs.added_modified, '/db/') && contains( github.event.pull_request.head.ref, 'db_migrate' ) != 'true'
+        if: contains(steps.get-changes.outputs.added_modified, 'db/') && contains( github.event.pull_request.head.ref, 'db_migrate' ) != 'true'
         run: echo Branch Name is Illegal
           
       
