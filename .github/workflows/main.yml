@@ -45,9 +45,14 @@ jobs:
       - name: Identify Branch Name
         run: echo ${{ github.event.pull_request.head.ref }}
         id: branch-name
+        
+      - name: Print Values 
+        run: |
+          echo ${{ steps.migration-files-changed.outputs.files_changed }}
+          echo startsWith(steps.branch-name.outputs, 'db_migrate')
       
       - name: Compare Legal Branch Name
-        if: ${{ steps.migration-files-changed.outputs.files_changed }} && startsWith( steps.branch-name.outputs, 'db_migrate')
+        if: ${{ steps.migration-files-changed.outputs.files_changed }} && startsWith(steps.branch-name.outputs, 'db_migrate')
         uses: actions/github-script@v3
         with:
           script: |
