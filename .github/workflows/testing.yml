@@ -16,21 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2.1.0
       - uses: jitterbit/get-changed-files@v1
-        id: abc
+        id: get-changes
         with:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Printing
-        run: |
-          echo "All:"
-          echo "${{ steps.abc.outputs.all }}"
-          echo "Added:"
-          echo "${{ steps.abc.outputs.added }}"
-          echo "Removed:"
-          echo "${{ steps.abc.outputs.removed }}"
-          echo "Renamed:"
-          echo "${{ steps.abc.outputs.renamed }}"
-          echo "Modified:"
-          echo "${{ steps.abc.outputs.modified }}"
-          echo "Added+Modified:"
-          echo "${{ steps.abc.outputs.added_modified }}"
+      - name: Printing A List of Modified / Added Files
+        run: echo "${{ steps.get-changes.outputs.added_modified }}"
+      
+      - name: Fetch the Branch Name 
+        run: echo ${{ github.event.pull_request.head.ref }}
+        
+      - name: Check If Branch Name is Legal
+        if: contains(fromJson(steps.get-changes.outputs.added_modified), '/db/') && contains( github.event.pull_request.head.ref, 'db_migrate' ) != 'true'
+        run: echo Branch Name is Illegal
+          
+      
