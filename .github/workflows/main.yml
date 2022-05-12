@@ -22,14 +22,14 @@ jobs:
         with:
           files: |
             'db/**'
-
+            
       - name: List all changed files
         run: |
           echo These are the Migration Changes
-          echo ${{ steps.migration-files-changed.outputs.all_changed_files }}
+          echo ${{ steps.migration-files-changed.outputs.files_changed }}
       
       - name: Find Migration Changes
-        if: ${{ steps.migration-files-changed.outputs.all_changed_files }}
+        if: ${{ steps.migration-files-changed.outputs.files_changed }}
         run: echo Migrations Found!!
       
       - name: Identify Branch Name
