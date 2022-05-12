@@ -47,7 +47,7 @@ jobs:
         id: branch-name
       
       - name: Compare Legal Branch Name
-        if: startsWith( steps.branch-name.outputs, 'db_migrate') != true && ${{ steps.migration-files-changed.outputs.files_changed }} == "true"
+        if: ${{ steps.migration-files-changed.outputs.files_changed }} && startsWith( steps.branch-name.outputs, 'db_migrate')
         uses: actions/github-script@v3
         with:
           script: |
