@@ -1,0 +1,59 @@
+name: Detect Migration Changes
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Test changed-files
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files using defaults
+        id: changed-files
+        uses: tj-actions/changed-files@v19
+        with:
+          path: .github/workflows/
+
+      - name: Get changed files
+        id: migration-files-changed
+        uses: tj-actions/changed-files@v19
+        with:
+          path: db
+          
+      - name: Run step when a file changes
+        if: ${{ steps.changed-files.outputs.modified_files }}
+        run: echo Migrations Found!!
+      
+      - name: List all changed files
+        run: |
+          echo These are the Migration Changes
+          echo ${{ steps.migration-files-changed.outputs.files_changed }}
+      
+      - name: Find Migration Changes
+        if: ${{ steps.migration-files-changed.outputs.files_changed }}
+        run: echo Migrations Found!!
+      
+      - name: Identify Branch Name
+        run: echo ${{ github.event.pull_request.head.ref }}
+        id: branch-name
+        
+      - name: Print Values 
+        run: |
+          echo ${{ steps.migration-files-changed.outputs.files_changed }} == "true"
+          echo ${{ startsWith(steps.branch-name.outputs, 'db_migrate') }}
+      
+      - name: Compare Legal Branch Name
+        if: steps.migration-files-changed.outputs.files_changed && startsWith(steps.branch-name.outputs, 'db_migrate')
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
