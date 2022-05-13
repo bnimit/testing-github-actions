@@ -59,13 +59,13 @@ jobs:
         
       - name: Illegal Action Check 1
         uses: actions/github-script@v3
-        if: ${{env.BRANCH_NAME_HAS_DB_MIGRATE == true && env.MIGRATION_CHANGES == true && env.FEATURE_CHANGES == true}}
+        if: ${{env.BRANCH_NAME_HAS_DB_MIGRATE == 'true' && env.FEATURE_CHANGES == 'true'}}
         with:
           script: core.setFailed('This is a Migration PR but also has feature changes which is not allowed!')
             
       - name: Illegal Action Check 2
         uses: actions/github-script@v3
-        if: ${{env.BRANCH_NAME_HAS_DB_MIGRATE == false && env.MIGRATION_CHANGES == true}}
+        if: ${{env.BRANCH_NAME_HAS_DB_MIGRATE == 'false' && env.MIGRATION_CHANGES == 'true'}}
         with:
           script: |
             core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
