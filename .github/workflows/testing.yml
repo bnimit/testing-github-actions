@@ -30,7 +30,7 @@ jobs:
         run: |
           echo Printing All The Filenames
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
-            echo filename
+            echo $filename
           done
         
       - name: Check If Branch Name is Legal
