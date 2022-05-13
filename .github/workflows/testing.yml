@@ -1,12 +1,14 @@
-# This is a basic workflow to help you get started with Actions
+# This is a workflow to perform a migration check on each pull request that is branched off master / main. There are two rules that this workflow will confirm :
+# a) If the PR includes migration changes it should have a branch name that starts with 'db_migrate'.
+# b) If the PR that includes migration changes should also not include any feature changes.
 
-name: Migration Checks
+name: DB Migration Checks
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master]
 
 jobs:
   test:
@@ -68,5 +70,5 @@ jobs:
         if: ${{env.BRANCH_NAME_HAS_DB_MIGRATE == 'false' && env.MIGRATION_CHANGES == 'true'}}
         with:
           script: |
-            core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
+            core.setFailed('Illegal Branch Name. Please start the branch name with the phrase db_migrate')
             
