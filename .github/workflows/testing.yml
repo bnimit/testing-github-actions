@@ -23,24 +23,54 @@ jobs:
         run: echo ${{ github.event.pull_request.head.ref }}
         
       - name: Declare Environment Variable 1
-        run: echo "IS_BRANCH_NAME_LEGAL=false" >> $GITHUB_ENV
+        run: echo "IS_BRANCH_NAME_LEGAL=true" >> $GITHUB_ENV
 
       - name: Declare Environment Variable 2
-        run: echo "MIGRATION_CODE_HAS_OTHER_CHANGES=false" >> $GITHUB_ENV
-        
-      - name: Check Branch for Migration Changes
+        run: echo "MIGRATION_BRANCH_HAS_OTHER_CHANGES=false" >> $GITHUB_ENV
+      
+      - name: Declare Environment Variable 3
+        run: echo "FEATURE_BRANCH_HAS_MIGRATION_CHANGES=false" >> $GITHUB_ENV
+           
+      - name: Ensure Migration PR Has No Feature Changes
+        if: startsWith(github.event.pull_request.head.ref, 'db_migrate')
+        run: |
+          env
+          for filename in ${{ steps.get-changes.outputs.added_modified }}; do
+            if [[ ! $filename == db/* ]]; then
+              echo "IS_BRANCH_NAME_LEGAL=false" >> $GITHUB_ENV
+              echo "MIGRATION_BRANCH_HAS_OTHER_CHANGES=true" >> $GITHUB_ENV
+            fi
+          done
+          
+      - name: Ensure Non Migration PRs Has No Migrations Changes
+        if: startsWith(github.event.pull_request.head.ref, 'db_migrate') != true'
         run: |
           env
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
             if [[ $filename == db/* ]]; then
-              echo $filename
-              echo "IS_BRANCH_NAME_LEGAL=true" >> $GITHUB_ENV
+              echo "IS_BRANCH_NAME_LEGAL=false" >> $GITHUB_ENV
+              echo "FEATURE_BRANCH_HAS_MIGRATION_CHANGES=true" >> $GITHUB_ENV
             fi
           done
         
-      - name: Check If Branch Name is Legal
+      - name: Illegal Branch Name
         uses: actions/github-script@v3
-        if: contains(steps.get-changes.outputs.added_modified, 'db/') && contains( github.event.pull_request.head.ref, 'db_migrate' ) != 'true'
+        if: IS_BRANCH_NAME_LEGAL == "false" && MIGRATION_BRANCH_HAS_OTHER_CHANGES == "true"
         with:
           script: |
             core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
+            core.setFailed('The branch also has feature changes which should be on a different PR')
+            
+      - name: Illegal Branch Name
+        uses: actions/github-script@v3
+        if: IS_BRANCH_NAME_LEGAL == "false" && FEATURE_BRANCH_HAS_MIGRATION_CHANGES == "false"
+        with:
+          script: |
+            core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
+      
+      - name: If Migration Branch Has Other Changes
+        uses: actions/github-script@v3
+        if: MIGRATION_CODE_HAS_OTHER_CHANGES == "true"
+        with:
+          script: |
+            core.setFailed('This is a Migration Change but includes feature changes as well, please push them on different PRs.')
