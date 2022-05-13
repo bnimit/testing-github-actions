@@ -23,54 +23,48 @@ jobs:
         run: echo ${{ github.event.pull_request.head.ref }}
         
       - name: Declare Environment Variable 1
-        run: echo "IS_BRANCH_NAME_LEGAL=true" >> $GITHUB_ENV
+        run: echo "BRANCH_NAME_HAS_DB_MIGRATE=false" >> $GITHUB_ENV
 
       - name: Declare Environment Variable 2
-        run: echo "MIGRATION_BRANCH_HAS_OTHER_CHANGES=false" >> $GITHUB_ENV
+        run: echo "MIGRATION_CHANGES=false" >> $GITHUB_ENV
       
       - name: Declare Environment Variable 3
-        run: echo "FEATURE_BRANCH_HAS_MIGRATION_CHANGES=false" >> $GITHUB_ENV
+        run: echo "FEATURE_CHANGES=false" >> $GITHUB_ENV
+        
+      - name: Branch Has DB_MIGRATE In The Name
+        if: startsWith(github.event.pull_request.head.ref, 'db_migrate')
+        run: echo "BRANCH_NAME_HAS_DB_MIGRATE=true" >> $GITHUB_ENV
            
       - name: Ensure Migration PR Has No Feature Changes
-        if: startsWith(github.event.pull_request.head.ref, 'db_migrate')
+        if: BRANCH_NAME_HAS_DB_MIGRATE == "true"
         run: |
           env
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
             if [[ ! $filename == db/* ]]; then
-              echo "IS_BRANCH_NAME_LEGAL=false" >> $GITHUB_ENV
-              echo "MIGRATION_BRANCH_HAS_OTHER_CHANGES=true" >> $GITHUB_ENV
+              echo "FEATURE_CHANGES=true" >> $GITHUB_ENV
             fi
           done
           
-      - name: Ensure Non Migration PRs Has No Migrations Changes
-        if: startsWith(github.event.pull_request.head.ref, 'db_migrate') != true'
+      - name: Ensure Feature Change PRs Has No Migrations Changes
+        if: BRANCH_NAME_HAS_DB_MIGRATE == "false"
         run: |
           env
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
             if [[ $filename == db/* ]]; then
-              echo "IS_BRANCH_NAME_LEGAL=false" >> $GITHUB_ENV
-              echo "FEATURE_BRANCH_HAS_MIGRATION_CHANGES=true" >> $GITHUB_ENV
+              echo "MIGRATION_CHANGES=true" >> $GITHUB_ENV
             fi
           done
         
-      - name: Illegal Branch Name
+      - name: Illegal Action Check 1
         uses: actions/github-script@v3
-        if: IS_BRANCH_NAME_LEGAL == "false" && MIGRATION_BRANCH_HAS_OTHER_CHANGES == "true"
+        if: BRANCH_NAME_HAS_DB_MIGRATE == "true" && MIGRATION_CHANGES == "true" && FEATURE_CHANGES == "true"
         with:
-          script: |
-            core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
-            core.setFailed('The branch also has feature changes which should be on a different PR')
+          script: core.setFailed('This is a Migration PR but also has feature changes which is not allowed!')
             
-      - name: Illegal Branch Name
+      - name: Illegal Action Check 2
         uses: actions/github-script@v3
-        if: IS_BRANCH_NAME_LEGAL == "false" && FEATURE_BRANCH_HAS_MIGRATION_CHANGES == "false"
+        if: BRANCH_NAME_HAS_DB_MIGRATE == "false" && MIGRATION_CHANGES == "true"
         with:
           script: |
             core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
-      
-      - name: If Migration Branch Has Other Changes
-        uses: actions/github-script@v3
-        if: MIGRATION_CODE_HAS_OTHER_CHANGES == "true"
-        with:
-          script: |
-            core.setFailed('This is a Migration Change but includes feature changes as well, please push them on different PRs.')
+            
