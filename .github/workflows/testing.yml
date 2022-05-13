@@ -26,9 +26,15 @@ jobs:
       - name: Fetch the Branch Name 
         run: echo ${{ github.event.pull_request.head.ref }}
         
+      - name: Declare Environment Variable 1
+        run: echo "IS_BRANCH_NAME_LEGAL=false" >> $GITHUB_ENV
+
+      - name: Declare Environment Variable 2
+        run: echo "MIGRATION_CODE_HAS_OTHER_CHANGES=false" >> $GITHUB_ENV
+        
       - name: Check Branch for Migration Changes
         run: |
-          echo Printing All The Filenames
+          env
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
             echo $filename
           done
