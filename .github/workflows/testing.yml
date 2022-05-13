@@ -12,7 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Changes
       - uses: actions/checkout@v2.1.0
       - uses: jitterbit/get-changed-files@v1
         id: get-changes
