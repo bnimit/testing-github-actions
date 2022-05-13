@@ -36,7 +36,7 @@ jobs:
         run: echo "BRANCH_NAME_HAS_DB_MIGRATE=true" >> $GITHUB_ENV
            
       - name: Ensure Migration PR Has No Feature Changes
-        if: BRANCH_NAME_HAS_DB_MIGRATE == "true"
+        if: ${{BRANCH_NAME_HAS_DB_MIGRATE}} == "true"
         run: |
           env
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
@@ -46,7 +46,7 @@ jobs:
           done
           
       - name: Ensure Feature Change PRs Has No Migrations Changes
-        if: BRANCH_NAME_HAS_DB_MIGRATE == "false"
+        if: ${{BRANCH_NAME_HAS_DB_MIGRATE}} == "false"
         run: |
           env
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
@@ -57,13 +57,13 @@ jobs:
         
       - name: Illegal Action Check 1
         uses: actions/github-script@v3
-        if: BRANCH_NAME_HAS_DB_MIGRATE == "true" && MIGRATION_CHANGES == "true" && FEATURE_CHANGES == "true"
+        if: ${{BRANCH_NAME_HAS_DB_MIGRATE}} == "true" && ${{MIGRATION_CHANGES}} == "true" && ${{FEATURE_CHANGES}} == "true"
         with:
           script: core.setFailed('This is a Migration PR but also has feature changes which is not allowed!')
             
       - name: Illegal Action Check 2
         uses: actions/github-script@v3
-        if: BRANCH_NAME_HAS_DB_MIGRATE == "false" && MIGRATION_CHANGES == "true"
+        if: ${{BRANCH_NAME_HAS_DB_MIGRATE}} == "false" && ${{MIGRATION_CHANGES}} == "true"
         with:
           script: |
             core.setFailed('Illegal Branch Name. Please start the branch name with db_migrate')
