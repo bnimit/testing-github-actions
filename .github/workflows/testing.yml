@@ -32,7 +32,10 @@ jobs:
         run: |
           env
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
-            echo "IS_BRANCH_NAME_LEGAL=${{ startsWith($filename, "db/") ? true : false }}" >> $GITHUB_ENV          
+            if [[ $filename == db/* ]]; then
+              echo $filename
+              echo "IS_BRANCH_NAME_LEGAL=true" >> $GITHUB_ENV
+            fi
           done
         
       - name: Check If Branch Name is Legal
