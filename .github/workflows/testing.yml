@@ -29,8 +29,8 @@ jobs:
       - name: Check Branch for Migration Changes
         run: |
           echo Printing All The Filenames
-          for $filename in ${{ steps.get-changes.outputs.added_modified }}; do
-            echo $filename
+          for filename in ${{ steps.get-changes.outputs.added_modified }}; do
+            echo filename
           done
         
       - name: Check If Branch Name is Legal
