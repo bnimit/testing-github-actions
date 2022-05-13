@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.1.0
+        with:
+          fetch-depth: 2
       - uses: jitterbit/get-changed-files@v1
         id: get-changes
         with:
