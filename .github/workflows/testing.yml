@@ -1,10 +1,8 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Files Changed
+name: Migration Checks
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
   pull_request:
@@ -14,15 +12,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Changes
       - uses: actions/checkout@v2.1.0
       - uses: jitterbit/get-changed-files@v1
         id: get-changes
         with:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Printing A List of Modified / Added Files
-        run: echo "${{ steps.get-changes.outputs.added_modified }}"
-      
+          
       - name: Fetch the Branch Name 
         run: echo ${{ github.event.pull_request.head.ref }}
         
@@ -36,7 +33,10 @@ jobs:
         run: |
           env
           for filename in ${{ steps.get-changes.outputs.added_modified }}; do
-            echo $filename
+            if startsWith($filename, 'db/')
+            then
+              echo "IS_BRANCH_NAME_LEGAL=true" >> $GITHUB_ENV
+            fi
           done
         
       - name: Check If Branch Name is Legal
