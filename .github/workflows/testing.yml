@@ -26,6 +26,13 @@ jobs:
       - name: Fetch the Branch Name 
         run: echo ${{ github.event.pull_request.head.ref }}
         
+      - name: Check Branch for Migration Changes
+        run: |
+          echo Printing All The Filenames
+          for $filename in "${{ steps.get-changes.outputs.added_modified }} do
+            echo $filename
+          done
+        
       - name: Check If Branch Name is Legal
         uses: actions/github-script@v3
         if: contains(steps.get-changes.outputs.added_modified, 'db/') && contains( github.event.pull_request.head.ref, 'db_migrate' ) != 'true'
